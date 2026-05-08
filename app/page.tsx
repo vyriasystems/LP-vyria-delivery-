@@ -78,42 +78,125 @@ const functionalityBlocks: FunctionalityBlock[] = [
   }
 ];
 
-const plans = [
-  {
-    name: "Start",
-    price: 49,
-    badge: "Iniciante",
-    features: ["Dashboard", "Cardapio de produtos", "Financeiro basico", "Configuracoes", "Link publico"],
-    highlighted: false
+const planosPorTipo = {
+  delivery: {
+    start: {
+      nome: "Start",
+      preco: 49,
+      badge: "Iniciante",
+      features: [
+        "Dashboard e metricas",
+        "Cardapio digital com link proprio",
+        "Financeiro basico",
+        "Configuracoes da loja",
+        "Importar cardapio por foto com IA (Growth)"
+      ]
+    },
+    growth: {
+      nome: "Growth",
+      preco: 99,
+      badge: "Mais popular",
+      destaque: true,
+      features: [
+        "Tudo do Start",
+        "Pedidos em tempo real",
+        "Promocoes e cupons",
+        "Relatorios de vendas",
+        "Importar cardapio por foto com IA"
+      ]
+    },
+    pro: {
+      nome: "Pro",
+      preco: 149,
+      badge: "Completo",
+      features: [
+        "Tudo do Growth",
+        "Aparencia personalizada",
+        "Automacoes WhatsApp",
+        "Impressao automatica",
+        "Foto e descricao de produto com IA"
+      ]
+    }
   },
-  {
-    name: "Growth",
-    price: 99,
-    badge: "Popular",
-    features: [
-      "Tudo do Start",
-      "Pedidos em tempo real",
-      "Promocoes",
-      "Relatorios",
-      "Importar cardapio por foto com IA"
-    ],
-    highlighted: true
+  presencial: {
+    start: {
+      nome: "Start",
+      preco: 49,
+      badge: "Iniciante",
+      features: [
+        "Dashboard e metricas",
+        "Cardapio digital",
+        "PDV — atendimento no balcao",
+        "Caixa com controle de turno",
+        "Configuracoes da loja"
+      ]
+    },
+    growth: {
+      nome: "Growth",
+      preco: 99,
+      badge: "Mais popular",
+      destaque: true,
+      features: [
+        "Tudo do Start",
+        "Garcom — pedidos por mesa",
+        "KDS — monitor de cozinha",
+        "QR Code de autoatendimento nas mesas",
+        "Relatorios de vendas"
+      ]
+    },
+    pro: {
+      nome: "Pro",
+      preco: 149,
+      badge: "Completo",
+      features: [
+        "Tudo do Growth",
+        "Aparencia personalizada",
+        "Automacoes WhatsApp",
+        "Impressao automatica",
+        "Foto e descricao de produto com IA"
+      ]
+    }
   },
-  {
-    name: "Pro",
-    price: 149,
-    badge: "Completo",
-    features: [
-      "Tudo do Growth",
-      "KDS monitor de cozinha",
-      "PDV balcao",
-      "Impressao automatica",
-      "Aparencia personalizada",
-      "Foto e descricao com IA"
-    ],
-    highlighted: false
+  hibrido: {
+    start: {
+      nome: "Start",
+      preco: 79,
+      badge: "Iniciante",
+      features: [
+        "Dashboard e metricas",
+        "Cardapio digital com link proprio",
+        "Pedidos online em tempo real",
+        "PDV — atendimento no balcao",
+        "Caixa com controle de turno"
+      ]
+    },
+    growth: {
+      nome: "Growth",
+      preco: 129,
+      badge: "Mais popular",
+      destaque: true,
+      features: [
+        "Tudo do Start",
+        "Garcom — pedidos por mesa",
+        "KDS — monitor de cozinha",
+        "QR Code de autoatendimento",
+        "Promocoes e relatorios"
+      ]
+    },
+    pro: {
+      nome: "Pro",
+      preco: 179,
+      badge: "Completo",
+      features: [
+        "Tudo do Growth",
+        "Aparencia personalizada",
+        "Automacoes WhatsApp",
+        "Impressao automatica",
+        "Foto e descricao de produto com IA"
+      ]
+    }
   }
-] as const;
+} as const;
 
 const testimonials = [
   {
@@ -260,9 +343,20 @@ export default function HomePage() {
   const [message, setMessage] = useState("");
   const [videoModalId, setVideoModalId] = useState<string | null>(null);
   const [activeReview, setActiveReview] = useState<string | null>(null);
+  const [tipoOperacao, setTipoOperacao] = useState<keyof typeof planosPorTipo>("delivery");
+  const [planosAnimating, setPlanosAnimating] = useState(false);
   const whatsappMessage = encodeURIComponent("Ola! Quero uma demonstracao da Vyria.");
   const whatsappLink = `https://wa.me/5562995597811?text=${whatsappMessage}`;
   const instagramUrl = "https://www.instagram.com/vyriadelivery/";
+
+  function handleTipoOperacao(next: keyof typeof planosPorTipo) {
+    if (next === tipoOperacao) return;
+    setPlanosAnimating(true);
+    window.setTimeout(() => {
+      setTipoOperacao(next);
+      setPlanosAnimating(false);
+    }, 200);
+  }
 
   const differentialCards: DifferentialCard[] = useMemo(
     () => [
@@ -594,19 +688,65 @@ export default function HomePage() {
         <section id="planos" className="plans">
           <div className="container">
             <h2>Planos que crescem com voce</h2>
-            <p>Comece pequeno, escale sem trocar de sistema</p>
-            <div className="planGrid">
-              {plans.map((plan) => (
-                <article key={plan.name} className={`planCard ${plan.highlighted ? "planHighlight" : ""}`}>
+            <p>Escolha o modelo que combina com o seu negocio</p>
+
+            <div className="planTypeSelector" role="tablist" aria-label="Tipo de operacao">
+              <button
+                type="button"
+                className={`planTypePill ${tipoOperacao === "delivery" ? "planTypePillActive" : ""}`}
+                onClick={() => handleTipoOperacao("delivery")}
+                role="tab"
+                aria-selected={tipoOperacao === "delivery"}
+              >
+                🛵 Delivery
+              </button>
+              <button
+                type="button"
+                className={`planTypePill ${tipoOperacao === "presencial" ? "planTypePillActive" : ""}`}
+                onClick={() => handleTipoOperacao("presencial")}
+                role="tab"
+                aria-selected={tipoOperacao === "presencial"}
+              >
+                🍽️ Presencial
+              </button>
+              <button
+                type="button"
+                className={`planTypePill ${tipoOperacao === "hibrido" ? "planTypePillActive" : ""}`}
+                onClick={() => handleTipoOperacao("hibrido")}
+                role="tab"
+                aria-selected={tipoOperacao === "hibrido"}
+              >
+                🔀 Hibrido <span className="planTypePillHint">Delivery + Presencial</span>
+              </button>
+            </div>
+
+            {tipoOperacao === "hibrido" ? (
+              <div className="planHybridNotice" role="note" aria-label="Aviso sobre plano hibrido">
+                O plano Hibrido combina todos os modulos de Delivery e Presencial. Ideal para quem atende no local e
+                tambem faz entregas.
+              </div>
+            ) : null}
+
+            <div className={`planGrid ${planosAnimating ? "planGridAnimating" : ""}`}>
+              {Object.values(planosPorTipo[tipoOperacao]).map((plan) => (
+                <article key={plan.nome} className={`planCard ${plan.destaque ? "planHighlight" : ""}`}>
                   <span className="planBadge">{plan.badge}</span>
-                  <h3>{plan.name}</h3>
-                  <p className="price">R${plan.price}/mes</p>
+                  <h3>{plan.nome}</h3>
+                  <p className="price">R${plan.preco}/mes</p>
                   <ul>{plan.features.map((feature) => <li key={feature}>✓ {feature}</li>)}</ul>
-                  <Link href="/register" className="btn btnPrimary full">Comecar agora</Link>
+                  <a className="btn btnPrimary full" href={whatsappLink} target="_blank" rel="noreferrer">
+                    Comecar agora
+                  </a>
                 </article>
               ))}
             </div>
-            <a className="plansHelp" href={whatsappLink} target="_blank" rel="noreferrer">Duvidas sobre qual plano escolher? Fale com a gente {"->"}</a>
+
+            <p className="plansDisclaimer">
+              Todos os planos incluem suporte via WhatsApp e podem ser cancelados a qualquer momento.
+            </p>
+            <a className="plansHelp" href={whatsappLink} target="_blank" rel="noreferrer">
+              Duvidas sobre qual plano escolher? Fale com a gente {"->"}
+            </a>
           </div>
         </section>
 
@@ -1076,6 +1216,54 @@ export default function HomePage() {
         .diffIcon :global(svg) { width:100%; height:100%; }
         .plans { background:${LIGHT}; padding:80px 0; text-align:center; }
         .plans > .container > p { margin-top:8px; color:#575757; }
+        .planTypeSelector {
+          margin-top: 18px;
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .planTypePill {
+          border: 1px solid rgba(0,0,0,0.14);
+          background: transparent;
+          color: #6b6b6b;
+          border-radius: 999px;
+          padding: 10px 14px;
+          font-weight: 700;
+          font-size: 13px;
+          cursor: pointer;
+          transition: .2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .planTypePill:hover { transform: translateY(-1px); }
+        .planTypePill:active { transform: scale(.98); }
+        .planTypePillActive {
+          background: ${ORANGE};
+          color: #fff;
+          border-color: transparent;
+        }
+        .planTypePillHint {
+          font-size: 10px;
+          color: #8b8b8b;
+          font-weight: 700;
+          margin-left: 6px;
+          white-space: nowrap;
+        }
+        .planTypePillActive .planTypePillHint { color: rgba(255,255,255,0.82); }
+        .planHybridNotice {
+          margin: 16px auto 0;
+          width: min(860px, 100%);
+          text-align: left;
+          background: #fff6d6;
+          border: 1px solid #f1dd9a;
+          color: #5a4a12;
+          border-radius: 12px;
+          padding: 12px 14px;
+          font-size: 13px;
+          line-height: 1.55;
+        }
         .planGrid {
           margin-top: 28px;
           display: grid;
@@ -1083,6 +1271,13 @@ export default function HomePage() {
           gap: 16px;
           text-align: left;
           justify-content: center;
+          opacity: 1;
+          transform: translateY(0);
+          transition: opacity .2s ease, transform .2s ease;
+        }
+        .planGridAnimating {
+          opacity: 0;
+          transform: translateY(8px);
         }
         .planCard { background:#fff; border:1px solid #ece5db; border-radius:12px; padding:20px; transition:.2s ease; }
         .planCard:hover { transform:translateY(-4px); box-shadow:0 14px 22px rgba(0,0,0,.08); }
@@ -1091,6 +1286,7 @@ export default function HomePage() {
         .planCard h3 { margin: 14px 0 6px; font-size: clamp(24px, 2.6vw, 30px); }
         .price { font-size:24px; font-weight:700; margin-bottom:14px; }
         .planCard ul { list-style:none; padding:0; margin:0 0 16px; display:grid; gap:8px; min-height:190px; }
+        .plansDisclaimer { margin: 16px 0 0; color: #7a7a7a; font-size: 12px; }
         .plansHelp { margin-top:20px; display:inline-block; color:${ORANGE}; font-weight:600; }
         .testimonials { padding:80px 0; text-align:center; background:#fff; }
         .reviewTrustBar {
