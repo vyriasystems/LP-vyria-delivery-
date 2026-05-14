@@ -27,8 +27,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const trackingScriptSrc =
+    process.env.NEXT_PUBLIC_TRACKING_SCRIPT_SRC ??
+    "http://localhost:3001/api/tracking/script/cmp5pz9ix0003104my8e6nfhr.js";
+
   return (
     <html lang="pt-BR">
+      <Script src={trackingScriptSrc} strategy="beforeInteractive" />
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-B3H0LKMQF4"
         strategy="afterInteractive"
