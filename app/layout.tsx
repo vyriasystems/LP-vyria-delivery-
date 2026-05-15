@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import { KwaiPixel } from "@/components/analytics/kwai-pixel";
 import "./globals.css";
 
 const inter = Inter({
@@ -60,6 +61,7 @@ export default function RootLayout({
           fbq('track', 'PageView');
         `}
       </Script>
+      <KwaiPixel />
       <body className={`${inter.variable} ${inter.className}`}>
         <noscript>
           <img
