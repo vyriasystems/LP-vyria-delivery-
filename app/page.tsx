@@ -8,13 +8,6 @@ const ORANGE = "#E8521A";
 const DARK = "#1a1a1a";
 const LIGHT = "#f9f7f4";
 
-const features = [
-  { icon: "menu", label: "Cardapio digital" },
-  { icon: "pulse", label: "Pedidos ao vivo" },
-  { icon: "spark", label: "IA integrada" },
-  { icon: "chat", label: "WhatsApp automatico" }
-] as const;
-
 type DifferentialCard = {
   icon: string;
   title: string;
@@ -23,38 +16,62 @@ type DifferentialCard = {
   linkLabel?: string;
 };
 
+type FeatureDisclaimer = {
+  text: string;
+  tone: "blue" | "green";
+};
+
 type FunctionalityBlock = {
-  badge?: string;
+  stepBadge?: string;
+  bonusLabel?: string;
   title: string;
+  headlineSub?: string;
   subtitle: string;
   list: string[];
+  disclaimers?: FeatureDisclaimer[];
   mockup: string;
+  mediaIndex: 0 | 1 | 2 | 3;
+  reverseLayout?: boolean;
   cta?: { label: string; href?: string; youtubeModalId?: string };
 };
 
 const functionalityBlocks: FunctionalityBlock[] = [
   {
+    stepBadge: "PASSO 1 — COMECE AQUI",
     title: "Seu cardapio online em minutos",
+    headlineSub: "Compartilhe por link ou QR Code. Sem marketplace.",
     subtitle:
-      "Crie produtos, categorias e personalize sua loja. Compartilhe o link com seus clientes e comece a receber pedidos agora mesmo - sem depender de marketplaces.",
-    list: ["Link publico exclusivo", "Abrir e fechar loja", "Imagens dos produtos", "Categorias organizadas"],
+      "Crie produtos, categorias e personalize sua loja. Compartilhe o link com seus clientes, use QR Code de Autoatendimento nas mesas e automatize seu atendimento agora mesmo.",
+    list: [
+      "Link publico exclusivo",
+      "QR Code de Autoatendimento",
+      "Painel para Garçom e Caixa",
+      "Impressão de Comandas na Cozinha"
+    ],
     mockup: "Loja publica",
-    cta: { label: "Ver exemplo de loja", youtubeModalId: "HcLP4z4DWfA" }
+    mediaIndex: 0,
+    cta: { label: "Conhecer o sistema", youtubeModalId: "HcLP4z4DWfA" }
   },
   {
+    stepBadge: "PASSO 2 — ACOMPANHE",
     title: "Nunca perca um pedido",
+    headlineSub: "Dashboard em tempo real. Acompanhe tudo.",
     subtitle:
       "Receba pedidos diretamente no seu painel, acompanhe o status em tempo real e mantenha sua operacao organizada - do preparo a entrega.",
     list: [
       "Notificacao instantanea",
-      "Status: pendente -> preparo -> entregue",
+      "Status: pendente → preparo → entregue",
       "Historico completo",
       "PDV para balcao (Pro)"
     ],
-    mockup: "Painel de pedidos"
+    mockup: "Painel de pedidos",
+    mediaIndex: 1,
+    reverseLayout: true
   },
   {
+    stepBadge: "PASSO 3 — CRESÇA",
     title: "IA que faz o trabalho pesado",
+    headlineSub: "De cardápio em papel para cardápio profissional.",
     subtitle:
       "Fotografe o cardapio em papel e a IA importa tudo automaticamente. Gera descricoes irresistiveis e fotos profissionais para cada produto - sem fotografo, sem copywriter.",
     list: [
@@ -63,10 +80,13 @@ const functionalityBlocks: FunctionalityBlock[] = [
       "Foto profissional gerada por IA"
     ],
     mockup: "IA gerando foto do produto",
+    mediaIndex: 2,
     cta: { label: "Ver como funciona", youtubeModalId: "0Fwj1ppS_Tg" }
   },
   {
+    bonusLabel: "24/7 sem você fazer nada",
     title: "Seu WhatsApp respondendo sozinho",
+    headlineSub: "Responde de madrugada. Automaticamente.",
     subtitle:
       "Configure uma vez e esqueça. Quando o cliente mandar mensagem, o sistema responde automaticamente com o link do cardápio — 24h por dia, sem você precisar estar online.",
     list: [
@@ -74,137 +94,161 @@ const functionalityBlocks: FunctionalityBlock[] = [
       "Envia o link do cardápio instantaneamente",
       "Funciona fora do horário de atendimento"
     ],
-    mockup: "WhatsApp automatico"
+    disclaimers: [{ text: "Incluído em TODOS os planos", tone: "green" }],
+    mockup: "WhatsApp automatico",
+    mediaIndex: 3,
+    reverseLayout: true
   }
 ];
 
-const planosPorTipo = {
-  delivery: {
-    start: {
-      nome: "Start",
-      preco: 49,
-      badge: "Iniciante",
-      features: [
-        "Dashboard e metricas",
-        "Cardapio digital com link proprio",
-        "Financeiro basico",
-        "Configuracoes da loja",
-        "Importar cardapio por foto com IA (Growth)"
-      ]
-    },
-    growth: {
-      nome: "Growth",
-      preco: 99,
-      badge: "Mais popular",
-      destaque: true,
-      features: [
-        "Tudo do Start",
-        "Pedidos em tempo real",
-        "Promocoes e cupons",
-        "Relatorios de vendas",
-        "Importar cardapio por foto com IA"
-      ]
-    },
-    pro: {
-      nome: "Pro",
-      preco: 149,
-      badge: "Completo",
-      features: [
-        "Tudo do Growth",
-        "Aparencia personalizada",
-        "Automacoes WhatsApp",
-        "Impressao automatica",
-        "Foto e descricao de produto com IA"
-      ]
-    }
+const GROWTH_PRO_CTA = [
+  {
+    id: "growth" as const,
+    nome: "Growth",
+    badge: "Mais popular",
+    preco: 89.9,
+    descricao: "Crescimento. Pedidos realtime, IA, entregadores/garçom, promoções",
+    features: [
+      "Pedidos em tempo real",
+      "Promoções e cupons",
+      "IA: foto cardápio + descrição",
+      "Entregadores ou garçom com QR",
+      "Relatórios de vendas"
+    ],
+    ctaLabel: "Começar com Growth"
   },
-  presencial: {
-    start: {
-      nome: "Start",
-      preco: 49,
-      badge: "Iniciante",
-      features: [
-        "Dashboard e metricas",
-        "Cardapio digital",
-        "PDV — atendimento no balcao",
-        "Caixa com controle de turno",
-        "Configuracoes da loja"
-      ]
-    },
-    growth: {
-      nome: "Growth",
-      preco: 99,
-      badge: "Mais popular",
-      destaque: true,
-      features: [
-        "Tudo do Start",
-        "Garcom — pedidos por mesa",
-        "KDS — monitor de cozinha",
-        "QR Code de autoatendimento nas mesas",
-        "Relatorios de vendas"
-      ]
-    },
-    pro: {
-      nome: "Pro",
-      preco: 149,
-      badge: "Completo",
-      features: [
-        "Tudo do Growth",
-        "Aparencia personalizada",
-        "Automacoes WhatsApp",
-        "Impressao automatica",
-        "Foto e descricao de produto com IA"
-      ]
-    }
-  },
-  hibrido: {
-    start: {
-      nome: "Start",
-      preco: 79,
-      badge: "Iniciante",
-      features: [
-        "Dashboard e metricas",
-        "Cardapio digital com link proprio",
-        "Pedidos online em tempo real",
-        "PDV — atendimento no balcao",
-        "Caixa com controle de turno"
-      ]
-    },
-    growth: {
-      nome: "Growth",
-      preco: 129,
-      badge: "Mais popular",
-      destaque: true,
-      features: [
-        "Tudo do Start",
-        "Garcom — pedidos por mesa",
-        "KDS — monitor de cozinha",
-        "QR Code de autoatendimento",
-        "Promocoes e relatorios"
-      ]
-    },
-    pro: {
-      nome: "Pro",
-      preco: 179,
-      badge: "Completo",
-      features: [
-        "Tudo do Growth",
-        "Aparencia personalizada",
-        "Automacoes WhatsApp",
-        "Impressao automatica",
-        "Foto e descricao de produto com IA"
-      ]
-    }
+  {
+    id: "pro" as const,
+    nome: "Pro",
+    badge: "Completo",
+    preco: 139.9,
+    descricao: "Operação profissional. Caixa, KDS, impressão, PIX, IA completa, inventário",
+    features: [
+      "Tudo do Growth",
+      "Caixa e KDS",
+      "Impressão térmica automática",
+      "IA: foto profissional",
+      "PIX no checkout e inventário"
+    ],
+    ctaLabel: "Começar com Pro",
+    destaque: true
   }
-} as const;
+];
 
-type Plano = {
-  nome: string;
-  preco: number;
-  badge: string;
-  destaque?: boolean;
-  features: readonly string[];
+type TipoOperacao = "delivery" | "presencial" | "hibrido";
+type PlanoTier = "start" | "growth" | "pro";
+
+type PlanFeatureRow = {
+  label: string;
+  start: boolean;
+  growth: boolean;
+  pro: boolean;
 };
+
+const PLAN_TIERS: {
+  id: PlanoTier;
+  nome: string;
+  badge: string;
+  descricao: string;
+  destaque?: boolean;
+}[] = [
+  {
+    id: "start",
+    nome: "Start",
+    badge: "Iniciante",
+    descricao: "Perfeito para começar. Cardápio digital + PDV"
+  },
+  {
+    id: "growth",
+    nome: "Growth",
+    badge: "Mais popular",
+    descricao: "Crescimento. Pedidos realtime, IA, entregadores/garçom, promoções",
+    destaque: true
+  },
+  {
+    id: "pro",
+    nome: "Pro",
+    badge: "Completo",
+    descricao: "Operação profissional. Caixa, KDS, impressão, PIX, IA completa, inventário"
+  }
+];
+
+const PLAN_PRICES: Record<TipoOperacao, Record<PlanoTier, number>> = {
+  delivery: { start: 49.9, growth: 89.9, pro: 139.9 },
+  presencial: { start: 49.9, growth: 89.9, pro: 139.9 },
+  hibrido: { start: 69.9, growth: 109.9, pro: 149.9 }
+};
+
+const PLAN_FEATURES_BY_TIPO: Record<TipoOperacao, PlanFeatureRow[]> = {
+  delivery: [
+    { label: "Dashboard & métricas", start: true, growth: true, pro: true },
+    { label: "Cardápio digital c/ link próprio", start: true, growth: true, pro: true },
+    { label: "Financeiro básico", start: true, growth: true, pro: true },
+    { label: "Configurações da loja", start: true, growth: true, pro: true },
+    { label: "Pedidos em tempo real", start: false, growth: true, pro: true },
+    { label: "Promoções e cupons", start: false, growth: true, pro: true },
+    { label: "Entregadores (com modo online)", start: false, growth: true, pro: true },
+    { label: "IA: foto cardápio + descrição", start: false, growth: true, pro: true },
+    { label: "Caixa (online)", start: false, growth: false, pro: true },
+    { label: "KDS (cozinha digital)", start: false, growth: false, pro: true },
+    { label: "Impressão térmica automática", start: false, growth: false, pro: true },
+    { label: "IA: foto profissional", start: false, growth: false, pro: true },
+    { label: "PIX no checkout", start: false, growth: false, pro: true },
+    { label: "Inventário/Stock", start: false, growth: false, pro: true }
+  ],
+  presencial: [
+    { label: "Dashboard & métricas", start: true, growth: true, pro: true },
+    { label: "Cardápio digital c/ link próprio", start: true, growth: true, pro: true },
+    { label: "PDV de balcão", start: true, growth: true, pro: true },
+    { label: "Financeiro básico", start: true, growth: true, pro: true },
+    { label: "Configurações", start: true, growth: true, pro: true },
+    { label: "Pedidos em tempo real", start: false, growth: true, pro: true },
+    { label: "Garçom c/ QR de mesa", start: false, growth: true, pro: true },
+    { label: "Promoções", start: false, growth: true, pro: true },
+    { label: "IA foto cardápio", start: false, growth: true, pro: true },
+    { label: "Caixa", start: false, growth: false, pro: true },
+    { label: "Mapa de garçom (staff + posição)", start: false, growth: false, pro: true },
+    { label: "KDS (cozinha)", start: false, growth: false, pro: true },
+    { label: "Impressão térmica", start: false, growth: false, pro: true },
+    { label: "IA: foto profissional", start: false, growth: false, pro: true },
+    { label: "PIX no checkout", start: false, growth: false, pro: true },
+    { label: "Inventário", start: false, growth: false, pro: true }
+  ],
+  hibrido: [
+    { label: "PDV + Link/QR + Entrega", start: true, growth: true, pro: true },
+    { label: "Dashboard & métricas", start: true, growth: true, pro: true },
+    { label: "Configurações completas", start: true, growth: true, pro: true },
+    { label: "Pedidos realtime", start: false, growth: true, pro: true },
+    { label: "Entregadores", start: false, growth: true, pro: true },
+    { label: "Garçom c/ QR", start: false, growth: true, pro: true },
+    { label: "Promoções", start: false, growth: true, pro: true },
+    { label: "IA foto cardápio", start: false, growth: true, pro: true },
+    { label: "Caixa", start: false, growth: false, pro: true },
+    { label: "KDS", start: false, growth: false, pro: true },
+    { label: "Mapa garçom (Pro)", start: false, growth: false, pro: true },
+    { label: "Impressão automática", start: false, growth: false, pro: true },
+    { label: "IA: foto profissional", start: false, growth: false, pro: true },
+    { label: "PIX no checkout", start: false, growth: false, pro: true },
+    { label: "Inventário", start: false, growth: false, pro: true }
+  ]
+};
+
+function formatPlanPrice(value: number): string {
+  return value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function PlanFeatureMark({ included }: { included: boolean }) {
+  return (
+    <span
+      className={`planMark ${included ? "planMarkIncluded" : "planMarkExcluded"}`}
+      aria-label={included ? "Incluído" : "Não incluído"}
+    >
+      <span className="planMarkIcon" aria-hidden="true">
+        {included ? "✓" : "×"}
+      </span>
+    </span>
+  );
+}
 
 const testimonials = [
   {
@@ -331,6 +375,68 @@ function Icon({ name }: { name: string }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.7" /></svg>;
 }
 
+function renderFeatureMockup(mediaIndex: FunctionalityBlock["mediaIndex"]) {
+  if (mediaIndex === 0) {
+    return (
+      <div className="phoneFrame">
+        <div className="phoneNotch" />
+        <iframe
+          title="Demonstracao Vyria no YouTube Shorts"
+          src="https://www.youtube.com/embed/3GGvRIkekQ0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+  if (mediaIndex === 1) {
+    return (
+      <div className="notebookFrame">
+        <div className="notebookLid">
+          <div className="notebookCamera" aria-hidden />
+          <div className="notebookScreen">
+            <iframe
+              title="Nunca perca um pedido — demonstracao em video"
+              src="https://www.youtube.com/embed/eChy1sCq8iI"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        </div>
+        <div className="notebookBase" aria-hidden />
+      </div>
+    );
+  }
+  if (mediaIndex === 2) {
+    return (
+      <div className="featureMediaFrame">
+        <Image
+          src="/mockup-ia-trabalho-pesado.png"
+          alt="IA importando cardapio em papel para o app Vyria"
+          fill
+          sizes="(max-width: 1024px) 92vw, 520px"
+          className="featureMediaImage"
+          style={{ objectFit: "contain" }}
+        />
+      </div>
+    );
+  }
+  return (
+    <div className="featureMediaFrame">
+      <Image
+        src="/mockup-automacoes-whatsapp.png"
+        alt="Vyria Delivery: automacoes WhatsApp, painel de metricas e mensagens para o restaurante"
+        fill
+        sizes="(max-width: 1024px) 92vw, 520px"
+        className="featureMediaImage"
+        style={{ objectFit: "contain" }}
+      />
+    </div>
+  );
+}
+
 function Logo() {
   return (
     <div className="logo">
@@ -351,13 +457,13 @@ export default function HomePage() {
   const [message, setMessage] = useState("");
   const [videoModalId, setVideoModalId] = useState<string | null>(null);
   const [activeReview, setActiveReview] = useState<string | null>(null);
-  const [tipoOperacao, setTipoOperacao] = useState<keyof typeof planosPorTipo>("delivery");
+  const [tipoOperacao, setTipoOperacao] = useState<TipoOperacao>("delivery");
   const [planosAnimating, setPlanosAnimating] = useState(false);
   const whatsappMessage = encodeURIComponent("Ola! Quero uma demonstracao da Vyria.");
   const whatsappLink = `https://wa.me/5562981203941?text=${whatsappMessage}`;
   const instagramUrl = "https://www.instagram.com/vyriadelivery/";
 
-  function handleTipoOperacao(next: keyof typeof planosPorTipo) {
+  function handleTipoOperacao(next: TipoOperacao) {
     if (next === tipoOperacao) return;
     setPlanosAnimating(true);
     window.setTimeout(() => {
@@ -370,28 +476,26 @@ export default function HomePage() {
     () => [
       {
         icon: "rocket",
-        title: "Seu cardapio no ar em minutos",
-        text: "Cadastre, configure e compartilhe o link. Sem precisar de tecnico, sem complicacao."
+        title: "Cardápio no ar em minutos",
+        text: "Nenhuma complicação técnica"
       },
       {
-        icon: "spark",
-        title: "IA integrada desde o Growth",
-        text: "Importe cardapios por foto, gere descricoes e fotos profissionais automaticamente."
-      },
-      {
-        icon: "mapPin",
-        title: "Atendimento presencial",
-        text: "Estamos em Senador Canedo - GO e atendemos toda a região. Prefere resolver pessoalmente? A gente marca.",
-        href: "https://maps.app.goo.gl/eubdeNcYsP3QXeKo7",
-        linkLabel: "Ver no mapa →"
+        icon: "chart",
+        title: "IA que Analisa a operação e ajuda a aumentar seu faturamento",
+        text: "Desde o Growth"
       },
       {
         icon: "whatsapp",
         title: "Suporte via WhatsApp",
-        text: "Estamos aqui para ajudar. Fale direto com a equipe e resolva qualquer duvida rapidamente."
+        text: "Fale direto, resolvemos rápido"
+      },
+      {
+        icon: "pulse",
+        title: "Presencial? Delivery? Híbrido?",
+        text: "Temos plano para cada modelo"
       }
     ],
-    [whatsappLink]
+    []
   );
 
   useEffect(() => {
@@ -497,8 +601,6 @@ export default function HomePage() {
           <a href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
           <a href="#depoimentos" onClick={() => setMenuOpen(false)}>Depoimentos</a>
           <a href="#contato" onClick={() => setMenuOpen(false)}>Contato</a>
-          <Link href="/login" className="btn btnOutlineDark">Entrar</Link>
-          <Link href="/register" className="btn btnPrimary">Comecar agora</Link>
         </div>
       </aside>
 
@@ -526,13 +628,18 @@ export default function HomePage() {
         <section className="hero">
           <div className="container heroGrid">
             <div>
-              <p className="chip revealDelay1">Novo: geracao de fotos com IA</p>
-              <h1 className="heroTitle revealDelay2">Sua loja de delivery,<br />do zero ao profissional</h1>
+              <p className="chip revealDelay1">Novo: IA para fotos</p>
+              <h1 className="heroTitle revealDelay2">
+                Seu Delivery/Restaurante,<br />
+                do papel ao profissional
+              </h1>
               <p className="heroSubtitle revealDelay3">
-                Cardapio digital com link proprio, pedidos em tempo real e IA que trabalha por voce - numa plataforma feita para quem vende comida de verdade.
+                Cardápio digital com link próprio, pedidos em tempo real e IA que trabalha por você
               </p>
               <div className="heroActions revealDelay4">
-                <a className="btn btnPrimary heroCta" href={whatsappLink} target="_blank" rel="noreferrer">Falar com consultor</a>
+                <a className="btn btnPrimary heroCta" href={whatsappLink} target="_blank" rel="noreferrer">
+                  Falar com consultor
+                </a>
               </div>
               <p className="heroProof revealDelay5">
                 <span className="googleDot" aria-hidden="true">
@@ -560,28 +667,19 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="proofBar">
-          <div className="container">
-            <p>Tudo que sua loja precisa em um so lugar</p>
-            <div className="proofGrid">
-              {features.map((item) => (
-                <div key={item.label} className="proofItem"><span><Icon name={item.icon} /></span>{item.label}</div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section id="funcionalidades">
           {functionalityBlocks.map((block, index) => (
             <div key={block.title} className={`featureSection ${index % 2 === 0 ? "light" : "white"}`}>
               <div
-                className={`container featureGrid ${index % 2 !== 0 && index !== 3 ? "reverse" : ""}`}
+                className={`container featureGrid ${block.reverseLayout ? "reverse" : ""}`}
                 data-reveal
               >
-                <div>
-                  {block.badge ? <p className="chip">{block.badge}</p> : null}
+                <div className="featureCopy">
+                  {block.stepBadge ? <p className="stepBadge">{block.stepBadge}</p> : null}
+                  {block.bonusLabel ? <p className="bonusLabel">{block.bonusLabel}</p> : null}
                   <h2>{block.title}</h2>
-                  <p>{block.subtitle}</p>
+                  {block.headlineSub ? <p className="featureHeadlineSub">{block.headlineSub}</p> : null}
+                  <p className="featureBody">{block.subtitle}</p>
                   <ul>
                     {block.list.map((item) => (
                       <li key={item}>
@@ -592,6 +690,15 @@ export default function HomePage() {
                       </li>
                     ))}
                   </ul>
+                  {block.disclaimers?.length ? (
+                    <div className="featureDisclaimers">
+                      {block.disclaimers.map((disclaimer) => (
+                        <p key={disclaimer.text} className={`featureDisclaimer featureDisclaimer-${disclaimer.tone}`}>
+                          {disclaimer.text}
+                        </p>
+                      ))}
+                    </div>
+                  ) : null}
                   {block.cta ? (
                     block.cta.youtubeModalId ? (
                       <button
@@ -609,11 +716,11 @@ export default function HomePage() {
                   ) : null}
                 </div>
                 <div
-                  className={`featureMockup ${index === 1 || index === 2 || index === 3 ? "featureMockupContain" : ""} ${
-                    index === 2 ? "featureMockupContainDark" : ""
+                  className={`featureMockup ${block.mediaIndex !== 0 ? "featureMockupContain" : ""} ${
+                    block.mediaIndex === 2 ? "featureMockupContainDark" : ""
                   }`}
                 >
-                  {index === 0 ? (
+                  {block.mediaIndex === 0 ? (
                     <div className="phoneFrame">
                       <div className="phoneNotch" />
                       <iframe
@@ -624,7 +731,7 @@ export default function HomePage() {
                         allowFullScreen
                       />
                     </div>
-                  ) : index === 1 ? (
+                  ) : block.mediaIndex === 1 ? (
                     <div className="notebookFrame">
                       <div className="notebookLid">
                         <div className="notebookCamera" aria-hidden />
@@ -640,7 +747,7 @@ export default function HomePage() {
                       </div>
                       <div className="notebookBase" aria-hidden />
                     </div>
-                  ) : index === 2 ? (
+                  ) : block.mediaIndex === 2 ? (
                     <div className="featureMediaFrame">
                       <Image
                         src="/mockup-ia-trabalho-pesado.png"
@@ -651,7 +758,7 @@ export default function HomePage() {
                         style={{ objectFit: "contain" }}
                       />
                     </div>
-                  ) : index === 3 ? (
+                  ) : block.mediaIndex === 3 ? (
                     <div className="featureMediaFrame">
                       <Image
                         src="/mockup-automacoes-whatsapp.png"
@@ -673,8 +780,9 @@ export default function HomePage() {
 
         <section className="differentials">
           <div className="container">
-            <h2>Por que escolher a Vyria?</h2>
-            <div className="diffGrid">
+            <h2>Pronto para crescer? Escolha seu plano</h2>
+            <p className="differentialsLead">Por que escolher a Vyria</p>
+            <div className="diffGrid diffGridValues">
               {differentialCards.map((card) => (
                 <article key={card.title} className="diffCard">
                   <span className="diffIcon">
@@ -682,11 +790,37 @@ export default function HomePage() {
                   </span>
                   <h3>{card.title}</h3>
                   <p>{card.text}</p>
-                  {card.href && card.linkLabel ? (
-                    <a className="diffCardLink" href={card.href} target="_blank" rel="noreferrer">
-                      {card.linkLabel}
-                    </a>
-                  ) : null}
+                </article>
+              ))}
+            </div>
+            <div className="growthProGrid">
+              {GROWTH_PRO_CTA.map((plan) => (
+                <article
+                  key={plan.id}
+                  className={`growthProCard ${plan.destaque ? "growthProCardHighlight" : ""}`}
+                >
+                  <span className="growthProBadge">{plan.badge}</span>
+                  <h3>{plan.nome}</h3>
+                  <p className="growthProPrice">R${formatPlanPrice(plan.preco)}/mês</p>
+                  <p className="growthProDesc">{plan.descricao}</p>
+                  <ul className="growthProList">
+                    {plan.features.map((feature) => (
+                      <li key={feature}>
+                        <span className="featureCheck" aria-hidden="true">
+                          ✓
+                        </span>{" "}
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    className={`btn full ${plan.destaque ? "btnDark" : "btnPrimary"}`}
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {plan.ctaLabel}
+                  </a>
                 </article>
               ))}
             </div>
@@ -724,36 +858,96 @@ export default function HomePage() {
                 role="tab"
                 aria-selected={tipoOperacao === "hibrido"}
               >
-                🔀 Hibrido <span className="planTypePillHint">Delivery + Presencial</span>
+                🔀 Híbrido
               </button>
             </div>
 
-            {tipoOperacao === "hibrido" ? (
-              <div className="planHybridNotice" role="note" aria-label="Aviso sobre plano hibrido">
-                O plano Hibrido combina todos os modulos de Delivery e Presencial. Ideal para quem atende no local e
-                tambem faz entregas.
+            <div className={`plansPanel ${planosAnimating ? "plansPanelAnimating" : ""}`}>
+              <div className="planGrid">
+                {PLAN_TIERS.map((tier) => (
+                  <article key={tier.id} className={`planCard ${tier.destaque ? "planHighlight" : ""}`}>
+                    <span className="planBadge">{tier.badge}</span>
+                    <h3>{tier.nome}</h3>
+                    <p className="price">R${formatPlanPrice(PLAN_PRICES[tipoOperacao][tier.id])}/mês</p>
+                    <p className="planDesc">{tier.descricao}</p>
+                    <a className="btn btnPrimary full" href={whatsappLink} target="_blank" rel="noreferrer">
+                      Começar agora
+                    </a>
+                  </article>
+                ))}
               </div>
-            ) : null}
 
-            <div className={`planGrid ${planosAnimating ? "planGridAnimating" : ""}`}>
-              {(Object.values(planosPorTipo[tipoOperacao]) as Plano[]).map((plan) => (
-                <article key={plan.nome} className={`planCard ${plan.destaque ? "planHighlight" : ""}`}>
-                  <span className="planBadge">{plan.badge}</span>
-                  <h3>{plan.nome}</h3>
-                  <p className="price">R${plan.preco}/mes</p>
-                  <ul>{plan.features.map((feature) => <li key={feature}>✓ {feature}</li>)}</ul>
-                  <a className="btn btnPrimary full" href={whatsappLink} target="_blank" rel="noreferrer">
-                    Comecar agora
-                  </a>
-                </article>
-              ))}
+              <div className="planCompareWrap">
+                <div className="planCompareHead">
+                  <div>
+                    <h3 className="planCompareTitle">Comparativo de recursos</h3>
+                    <p className="planCompareSubtitle">Veja o que cada plano inclui neste modelo</p>
+                  </div>
+                  <span className="planCompareMode">
+                    {tipoOperacao === "delivery"
+                      ? "Delivery"
+                      : tipoOperacao === "presencial"
+                        ? "Presencial"
+                        : "Híbrido"}
+                  </span>
+                </div>
+                <div className="planCompareLegend" aria-hidden="true">
+                  <span className="planCompareLegendItem">
+                    <span className="planMarkIcon planMarkIconYes">✓</span> Incluído
+                  </span>
+                  <span className="planCompareLegendItem">
+                    <span className="planMarkIcon planMarkIconNo">×</span> Não incluído
+                  </span>
+                </div>
+                <table className="planCompareTable">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="planCompareFeatureCol">
+                        Recursos
+                      </th>
+                      {PLAN_TIERS.map((tier) => (
+                        <th
+                          key={tier.id}
+                          scope="col"
+                          className={`planCompareTierCol ${tier.destaque ? "planCompareTierColHighlight" : ""}`}
+                        >
+                          <span className="planCompareTierName">{tier.nome}</span>
+                          <span
+                            className={`planCompareTierBadge ${tier.destaque ? "" : "planCompareTierBadgeMuted"}`}
+                          >
+                            {tier.badge}
+                          </span>
+                          <span className="planCompareTierPrice">
+                            R${formatPlanPrice(PLAN_PRICES[tipoOperacao][tier.id])}/mês
+                          </span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {PLAN_FEATURES_BY_TIPO[tipoOperacao].map((row, rowIndex) => (
+                      <tr key={row.label} className={rowIndex % 2 === 0 ? "planCompareRowEven" : ""}>
+                        <th scope="row">{row.label}</th>
+                        <td className={row.start ? "planCompareCellYes" : "planCompareCellNo"}>
+                          <PlanFeatureMark included={row.start} />
+                        </td>
+                        <td
+                          className={`planCompareTierColHighlight ${row.growth ? "planCompareCellYes" : "planCompareCellNo"}`}
+                        >
+                          <PlanFeatureMark included={row.growth} />
+                        </td>
+                        <td className={row.pro ? "planCompareCellYes" : "planCompareCellNo"}>
+                          <PlanFeatureMark included={row.pro} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <p className="plansDisclaimer">
-              Todos os planos incluem suporte via WhatsApp e podem ser cancelados a qualquer momento.
-            </p>
             <a className="plansHelp" href={whatsappLink} target="_blank" rel="noreferrer">
-              Duvidas sobre qual plano escolher? Fale com a gente {"->"}
+              Dúvidas? Fale com a gente {"->"}
             </a>
           </div>
         </section>
@@ -792,9 +986,14 @@ export default function HomePage() {
                   role="button"
                   tabIndex={0}
                 >
-                  <div className="testTop">
+                  <header className="testHeader">
                     <div className="avatar">
                       <img src={item.selfie} alt={`Foto de ${item.name}`} loading="lazy" />
+                    </div>
+                    <div className="testHeaderMeta">
+                      <h3>{item.name}</h3>
+                      <small className="testDate">{item.date}</small>
+                      <p className="testBusiness">{item.business}</p>
                     </div>
                     <span className="googleMini" aria-hidden="true">
                       <svg viewBox="0 0 24 24" focusable="false">
@@ -804,12 +1003,9 @@ export default function HomePage() {
                         <path fill="#FBBC05" d="M12 6.06c1.5 0 2.85.52 3.91 1.53l2.93-2.93C17.07 2.97 14.76 2 12 2A9.99 9.99 0 0 0 2.84 7.63l3.41 2.65c.81-2.42 3.08-4.22 5.75-4.22z" />
                       </svg>
                     </span>
-                  </div>
-                  <h3>{item.name}</h3>
-                  <small>{item.date}</small>
-                  <p className="testBusiness">{item.business}</p>
+                  </header>
                   <span className="testStars">★★★★★</span>
-                  <p>{item.text}</p>
+                  <p className="testQuote">{item.text}</p>
                 </article>
               ))}
             </div>
@@ -1188,13 +1384,56 @@ export default function HomePage() {
         }
         .proofItem span { width:26px; height:26px; color:${ORANGE}; }
         .proofItem span :global(svg) { width:100%; height:100%; }
-        .featureSection { padding:70px 0; }
+        .featureSection { padding:80px 0; }
         .featureSection.light { background:${LIGHT}; }
         .featureSection.white { background:#fff; }
-        .featureGrid { display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:center; opacity:0; transform:translateY(30px); transition:.5s ease; }
+        .featureGrid {
+          display:grid;
+          grid-template-columns:minmax(0, 7fr) minmax(0, 3fr);
+          gap:48px;
+          align-items:center;
+          opacity:0;
+          transform:translateY(30px);
+          transition:.5s ease;
+        }
         .featureGrid.reverse { direction:rtl; }
         .featureGrid.reverse > * { direction:ltr; }
         .featureGrid.visible { opacity:1; transform:translateY(0); }
+        .stepBadge {
+          display:inline-block;
+          margin:0 0 10px;
+          font-size:11px;
+          font-weight:800;
+          letter-spacing:0.08em;
+          text-transform:uppercase;
+          color:${ORANGE};
+        }
+        .bonusLabel {
+          display:inline-block;
+          margin:0 0 10px;
+          font-size:12px;
+          font-weight:700;
+          color:#6b6b6b;
+          text-transform:uppercase;
+          letter-spacing:0.04em;
+        }
+        .featureHeadlineSub {
+          margin:0 0 10px;
+          font-size:18px;
+          font-weight:700;
+          color:#2a2a2a;
+          line-height:1.4;
+        }
+        .featureBody { color:#4f4f4f; line-height:1.65; margin:0 0 4px; }
+        .featureDisclaimers { display:grid; gap:6px; margin:0 0 14px; }
+        .featureDisclaimer {
+          margin:0;
+          font-size:12px;
+          font-weight:600;
+          line-height:1.4;
+        }
+        .featureDisclaimer-blue { color:#3B82F6; }
+        .featureDisclaimer-green { color:#22C55E; }
         h2 { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.08; margin: 0 0 12px; color: #0f0f0f; }
         .differentials h2,
         .plans h2,
@@ -1208,8 +1447,71 @@ export default function HomePage() {
         .featureGrid p { color:#4f4f4f; line-height:1.65; }
         .featureGrid ul { list-style:none; padding:0; margin:14px 0 18px; display:grid; gap:8px; color: #2a2a2a; }
         .differentials { background:${DARK}; color:#fff; padding:80px 0; }
-        .differentials h2 { text-align:center; }
-        .diffGrid { margin-top:26px; display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+        .differentials h2 { text-align:center; margin-bottom:8px; }
+        .differentialsLead {
+          text-align:center;
+          margin:0 0 24px;
+          color:#b8b8b8;
+          font-size:14px;
+          font-weight:600;
+          letter-spacing:0.04em;
+          text-transform:uppercase;
+        }
+        .diffGrid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+        .diffGridValues { margin-bottom:32px; }
+        .growthProGrid {
+          display:grid;
+          grid-template-columns:repeat(2, minmax(0, 1fr));
+          gap:16px;
+          max-width:920px;
+          margin:0 auto;
+        }
+        .growthProCard {
+          background:#252525;
+          border:1px solid #3a3a3a;
+          border-radius:12px;
+          padding:22px;
+          text-align:left;
+          display:flex;
+          flex-direction:column;
+        }
+        .growthProCardHighlight {
+          background:${ORANGE};
+          border-color:${ORANGE};
+          color:#1a1a1a;
+          transform:scale(1.02);
+          box-shadow:0 16px 32px rgba(232,82,26,0.28);
+        }
+        .growthProCardHighlight h3,
+        .growthProCardHighlight .growthProDesc,
+        .growthProCardHighlight .growthProList { color:#1a1a1a; }
+        .growthProCardHighlight .growthProBadge { background:rgba(0,0,0,0.12); color:#1a1a1a; }
+        .growthProCardHighlight .featureCheck { color:#1a1a1a; }
+        .growthProBadge {
+          display:inline-block;
+          border-radius:999px;
+          padding:6px 10px;
+          background:#333;
+          font-size:11px;
+          font-weight:800;
+          letter-spacing:0.06em;
+          text-transform:uppercase;
+          margin-bottom:10px;
+        }
+        .growthProPrice { font-size:26px; font-weight:800; margin:0 0 8px; }
+        .growthProDesc { color:#cfcfcf; font-size:14px; line-height:1.5; margin:0 0 12px; }
+        .growthProList {
+          list-style:none;
+          padding:0;
+          margin:0 0 16px;
+          display:grid;
+          gap:8px;
+          flex:1;
+          color:#e8e8e8;
+          font-size:14px;
+        }
+        .btnDark { background:#1a1a1a; color:#fff; border:1px solid #1a1a1a; }
+        .btnDark:hover { filter:brightness(1.08); }
         .diffCard { border:1px solid #333; border-radius:12px; background:#202020; padding:20px; }
         .diffCard p { color:#d1d1d1; }
         .diffCardLink {
@@ -1252,48 +1554,232 @@ export default function HomePage() {
           color: #fff;
           border-color: transparent;
         }
-        .planTypePillHint {
-          font-size: 10px;
-          color: #8b8b8b;
-          font-weight: 700;
-          margin-left: 6px;
-          white-space: nowrap;
+        .plansPanel {
+          margin-top: 28px;
+          opacity: 1;
+          transform: translateY(0);
+          transition: opacity .2s ease, transform .2s ease;
         }
-        .planTypePillActive .planTypePillHint { color: rgba(255,255,255,0.82); }
-        .planHybridNotice {
-          margin: 16px auto 0;
-          width: min(860px, 100%);
-          text-align: left;
-          background: #fff6d6;
-          border: 1px solid #f1dd9a;
-          color: #5a4a12;
-          border-radius: 12px;
-          padding: 12px 14px;
-          font-size: 13px;
-          line-height: 1.55;
+        .plansPanelAnimating {
+          opacity: 0;
+          transform: translateY(8px);
         }
         .planGrid {
-          margin-top: 28px;
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 16px;
           text-align: left;
           justify-content: center;
-          opacity: 1;
-          transform: translateY(0);
-          transition: opacity .2s ease, transform .2s ease;
         }
-        .planGridAnimating {
-          opacity: 0;
-          transform: translateY(8px);
+        .planCard {
+          background: #fff;
+          border: 1px solid #ece5db;
+          border-radius: 12px;
+          padding: 20px;
+          transition: .2s ease;
+          display: flex;
+          flex-direction: column;
         }
-        .planCard { background:#fff; border:1px solid #ece5db; border-radius:12px; padding:20px; transition:.2s ease; }
         .planCard:hover { transform:translateY(-4px); box-shadow:0 14px 22px rgba(0,0,0,.08); }
         .planHighlight { border-color:${ORANGE}; box-shadow:0 0 0 1px ${ORANGE}; }
         .planBadge { display:inline-block; border-radius:999px; padding:6px 10px; background:#f2f2f2; font-size:12px; font-weight:700; }
         .planCard h3 { margin: 14px 0 6px; font-size: clamp(24px, 2.6vw, 30px); }
-        .price { font-size:24px; font-weight:700; margin-bottom:14px; }
-        .planCard ul { list-style:none; padding:0; margin:0 0 16px; display:grid; gap:8px; min-height:190px; }
+        .price { font-size:24px; font-weight:700; margin-bottom:10px; }
+        .planDesc {
+          color: #5a5a5a;
+          font-size: 14px;
+          line-height: 1.55;
+          margin: 0 0 16px;
+          flex: 1;
+        }
+        .planCompareWrap {
+          margin-top: 28px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          border: 1px solid #ece5db;
+          border-radius: 16px;
+          background: #fff;
+          text-align: left;
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+        }
+        .planCompareHead {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 16px;
+          padding: 20px 20px 12px;
+          border-bottom: 1px solid #f0ebe3;
+        }
+        .planCompareTitle {
+          margin: 0 0 4px;
+          font-size: clamp(20px, 2.4vw, 26px);
+          font-weight: 800;
+          color: #1a1a1a;
+        }
+        .planCompareSubtitle {
+          margin: 0;
+          font-size: 14px;
+          color: #6b6b6b;
+        }
+        .planCompareMode {
+          flex-shrink: 0;
+          border-radius: 999px;
+          padding: 8px 14px;
+          background: rgba(232, 82, 26, 0.1);
+          color: ${ORANGE};
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+        .planCompareLegend {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+          padding: 12px 20px;
+          border-bottom: 1px solid #f0ebe3;
+          background: #faf8f5;
+        }
+        .planCompareLegendItem {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          font-weight: 600;
+          color: #555;
+        }
+        .planCompareTable {
+          width: 100%;
+          min-width: 680px;
+          border-collapse: separate;
+          border-spacing: 0;
+          font-size: 14px;
+        }
+        .planCompareTable th,
+        .planCompareTable td {
+          padding: 14px 16px;
+          border-bottom: 1px solid #f0ebe3;
+          text-align: center;
+          vertical-align: middle;
+        }
+        .planCompareTable thead th {
+          background: #faf8f5;
+          font-weight: 700;
+          color: #333;
+          position: sticky;
+          top: 0;
+          z-index: 2;
+        }
+        .planCompareFeatureCol {
+          text-align: left !important;
+          min-width: 240px;
+          position: sticky;
+          left: 0;
+          z-index: 3;
+          background: #faf8f5;
+          box-shadow: 4px 0 8px rgba(0, 0, 0, 0.04);
+        }
+        .planCompareTierCol {
+          min-width: 120px;
+        }
+        .planCompareTierColHighlight {
+          background: rgba(232, 82, 26, 0.08) !important;
+          box-shadow: inset 0 0 0 1px rgba(232, 82, 26, 0.18);
+        }
+        .planCompareTierName {
+          display: block;
+          font-size: 16px;
+          font-weight: 800;
+          margin-bottom: 6px;
+        }
+        .planCompareTierBadge {
+          display: inline-block;
+          border-radius: 999px;
+          padding: 4px 10px;
+          background: ${ORANGE};
+          color: #fff;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          margin-bottom: 8px;
+        }
+        .planCompareTierBadgeMuted {
+          background: #e8e8e8;
+          color: #666;
+        }
+        .planCompareTierPrice {
+          display: block;
+          font-size: 13px;
+          font-weight: 700;
+          color: #444;
+        }
+        .planCompareTable tbody th[scope="row"] {
+          text-align: left;
+          font-weight: 600;
+          color: #333;
+          min-width: 240px;
+          position: sticky;
+          left: 0;
+          z-index: 1;
+          background: #fff;
+          box-shadow: 4px 0 8px rgba(0, 0, 0, 0.04);
+        }
+        .planCompareRowEven th[scope="row"],
+        .planCompareRowEven td {
+          background-color: #fcfaf7;
+        }
+        .planCompareTable tbody tr:hover th[scope="row"] {
+          background-color: #fff6f1;
+        }
+        .planCompareTable tbody tr:hover td:not(.planCompareTierColHighlight) {
+          background-color: #fff6f1;
+        }
+        .planCompareTable tbody tr:hover td.planCompareTierColHighlight {
+          background-color: rgba(232, 82, 26, 0.14) !important;
+        }
+        .planCompareTable tbody tr:last-child th,
+        .planCompareTable tbody tr:last-child td {
+          border-bottom: none;
+        }
+        .planCompareCellYes {
+          background-color: rgba(34, 197, 94, 0.06);
+        }
+        .planCompareCellNo {
+          background-color: rgba(0, 0, 0, 0.02);
+        }
+        .planMark {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .planMarkIcon {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          display: inline-grid;
+          place-items: center;
+          font-size: 14px;
+          font-weight: 800;
+          line-height: 1;
+        }
+        .planMarkIconYes {
+          background: rgba(34, 197, 94, 0.15);
+          color: #16a34a;
+          border: 1px solid rgba(34, 197, 94, 0.35);
+        }
+        .planMarkIncluded .planMarkIcon {
+          background: rgba(34, 197, 94, 0.15);
+          color: #16a34a;
+          border: 1px solid rgba(34, 197, 94, 0.35);
+        }
+        .planMarkIconNo,
+        .planMarkExcluded .planMarkIcon {
+          background: #f3f3f3;
+          color: #a3a3a3;
+          border: 1px solid #e0e0e0;
+          font-size: 16px;
+        }
         .plansDisclaimer { margin: 16px 0 0; color: #7a7a7a; font-size: 12px; }
         .plansHelp { margin-top:20px; display:inline-block; color:${ORANGE}; font-weight:600; }
         .testimonials { padding:80px 0; text-align:center; background:#fff; }
@@ -1356,7 +1842,13 @@ export default function HomePage() {
           box-shadow: 0 10px 20px rgba(0,0,0,.08);
           transform: translateY(-2px);
         }
-        .testTop { display:flex; justify-content:space-between; align-items:center; }
+        .testHeader {
+          display: grid;
+          grid-template-columns: 34px minmax(0, 1fr) auto;
+          gap: 8px 10px;
+          align-items: start;
+        }
+        .testHeaderMeta { min-width: 0; }
         .avatar {
           width: 34px;
           height: 34px;
@@ -1387,11 +1879,11 @@ export default function HomePage() {
           height: 16px;
           display: block;
         }
-        .testCard h3 { margin: 10px 0 2px; font-size: 16px; font-weight: 700; }
-        .testCard small { color:#7a7a7a; font-size:12px; }
-        .testBusiness { margin: 6px 0 4px; font-size: 13px; color:#4b4b4b; }
-        .testStars { display:inline-block; color:#ffb400; letter-spacing:.08em; font-size:13px; margin-bottom:6px; }
-        .testCard p { color:#454545; line-height:1.6; }
+        .testCard h3 { margin: 0 0 2px; font-size: 16px; font-weight: 700; line-height: 1.2; }
+        .testDate { color:#7a7a7a; font-size:11px; display:block; margin-bottom:2px; }
+        .testBusiness { margin: 0; font-size: 12px; color:#4b4b4b; line-height: 1.3; }
+        .testStars { display:inline-block; color:#ffb400; letter-spacing:.08em; font-size:13px; margin:8px 0 6px; }
+        .testQuote { margin:0; color:#454545; line-height:1.55; font-size:14px; }
         .contact { background:${DARK}; color:#fff; padding:80px 0; }
         .contactGrid { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
         .contact p { color:#c9c9c9; line-height:1.6; }
@@ -1508,9 +2000,12 @@ export default function HomePage() {
         @media (max-width: 1024px) {
           .navLinks { display:none; }
           .menuButton { display:block; }
-          .heroGrid, .featureGrid, .contactGrid { grid-template-columns:1fr; }
-          .proofGrid, .diffGrid, .planGrid { grid-template-columns:repeat(2,1fr); }
-          .testGrid { grid-template-columns:repeat(2,1fr); }
+          .heroGrid, .featureGrid, .contactGrid, .growthProGrid { grid-template-columns:1fr; }
+          .featureGrid.reverse { direction:ltr; }
+          .growthProCardHighlight { transform:none; }
+          .diffGrid { grid-template-columns:repeat(2,1fr); }
+          .planGrid { grid-template-columns:repeat(2,1fr); }
+          .testGrid { grid-template-columns:repeat(2,1fr); align-items:start; }
           .phoneFrame { width: min(280px, 100%); }
           .footerTopGrid { grid-template-columns:1fr 1fr; gap:28px; }
           .footerContactCol { grid-column: span 2; }
@@ -1530,7 +2025,51 @@ export default function HomePage() {
             align-content: center;
           }
           .proofItem span { width: 22px; height: 22px; }
-          .diffGrid, .planGrid, .testGrid { grid-template-columns:1fr; }
+          .diffGrid, .planGrid { grid-template-columns:1fr; }
+          .testGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            align-items: start;
+          }
+          .testCard {
+            padding: 10px;
+            border-radius: 10px;
+          }
+          .testHeader {
+            grid-template-columns: 30px minmax(0, 1fr) auto;
+            gap: 6px 8px;
+          }
+          .testCard .avatar { width: 30px; height: 30px; }
+          .testCard .googleMini { width: 20px; height: 20px; }
+          .testCard .googleMini :global(svg) { width: 12px; height: 12px; }
+          .testCard h3 {
+            font-size: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          .testDate { display: none; }
+          .testBusiness {
+            font-size: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          .testStars {
+            font-size: 10px;
+            margin: 6px 0 4px;
+            letter-spacing: 0;
+          }
+          .testQuote {
+            font-size: 11px;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
           .hero { padding-top:120px; }
           .heroSubtitle { font-size:16px; }
           .footerTopGrid { grid-template-columns:1fr; gap:24px; }
