@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Syne } from "next/font/google";
+import { VYRIA_INSTAGRAM_URL } from "@/lib/contact";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -9,9 +10,8 @@ const syne = Syne({
 });
 
 export default function PrivacidadePage() {
-  const adminWhatsapp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || "";
   const adminEmail = process.env.ADMIN_EMAIL || "vyriasystems@gmail.com";
-  const whatsappHref = adminWhatsapp ? `https://wa.me/${adminWhatsapp}` : "#";
+  const instagramUrl = VYRIA_INSTAGRAM_URL;
 
   return (
     <div className="privacyPage">
@@ -115,7 +115,7 @@ export default function PrivacidadePage() {
             <li>Revogar o consentimento</li>
           </ul>
           <p>
-            Para exercer esses direitos, entre em contato pelo WhatsApp ou email informados abaixo.
+            Para exercer esses direitos, entre em contato pelo Instagram ou email informados abaixo.
           </p>
         </section>
 
@@ -138,7 +138,12 @@ export default function PrivacidadePage() {
         <section>
           <h2>10. Contato</h2>
           <p>Em caso de duvidas sobre esta politica ou sobre o tratamento dos seus dados:</p>
-          <p className="contactLine">WhatsApp: <a href={whatsappHref} target="_blank" rel="noreferrer">{adminWhatsapp || "Nao informado"}</a></p>
+          <p className="contactLine">
+            Instagram:{" "}
+            <a href={instagramUrl} target="_blank" rel="noreferrer">
+              @vyriadelivery
+            </a>
+          </p>
           <p className="contactLine">Email: <a href={`mailto:${adminEmail}`}>{adminEmail}</a></p>
           <p className="contactLine">Endereco: Senador Canedo - GO, Brasil</p>
         </section>
